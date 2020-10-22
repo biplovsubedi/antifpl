@@ -22,9 +22,6 @@ Endpoints:
 https://fantasy.premierleague.com/api/entry/4621202/event/4/picks/  -> See picks for a player in a week
 History of a player: https://fantasy.premierleague.com/api/entry/4621202/history/
 
-
-
-
 """
 
 
