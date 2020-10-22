@@ -5,11 +5,12 @@
 <table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
     <thead>
         <tr>
+            <th></th>
             <th>#</th>
             <th>#GW{{ gameweek - 1 }}</th>
             <th>Player</th>
             <th>Value</th>
-            <th>Transers</th>
+            <th>Transfers</th>
             <th>Chip</th>
             <th>Last GW</th>
             <th>GW {{ gameweek }} Pts</th>
@@ -21,14 +22,13 @@
         <tr>
             <td>
                 {% if user['rank'] < user['last_gw_rank'] %}
-                <span style="color: green; margin: 0; padding: 0;">{{ user['rank']  }} &#10506;</span>
+                <span style="color: green; margin: 0; padding: 0;">&#10506;</span>
                 {% elif user['rank'] > user['last_gw_rank'] %}
-                <span style="color: red;">{{ user['rank']  }} &#10507;</span>
-                {% else %}
-                {{ user['rank']  }}
+                <span style="color: red;"> &#10507;</span>
                 {% endif %}
             
             </td>
+            <td>{{ user['rank']  }}</td>
             <td> {{ user['last_gw_rank']  }}</td>
             <td><a target="_blank"
                     href="https://fantasy.premierleague.com/entry/{{ user['entry'] }}/event/{{ gameweek }}">
