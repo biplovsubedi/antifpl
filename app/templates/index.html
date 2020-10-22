@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h4>{% block title %} GW {{ gameweek }} {% endblock %}</h4>
+<table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>#GW{{ gameweek - 1 }}</th>
+            <th>Player</th>
+            <th>Value</th>
+            <th>Transers</th>
+            <th>Chip</th>
+            <th>Last GW</th>
+            <th>GW {{ gameweek }} Pts</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in standings %}
+        <tr>
+            <td>
+                {% if user['rank'] < user['last_gw_rank'] %}
+                <span style="color: green; margin: 0; padding: 0;">{{ user['rank']  }} &#10506;</span>
+                {% elif user['rank'] > user['last_gw_rank'] %}
+                <span style="color: red;">{{ user['rank']  }} &#10507;</span>
+                {% else %}
+                {{ user['rank']  }}
+                {% endif %}
+            
+            </td>
+            <td> {{ user['last_gw_rank']  }}</td>
+            <td><a target="_blank"
+                    href="https://fantasy.premierleague.com/entry/{{ user['entry'] }}/event/{{ gameweek }}">
+                    {{ user['player_name']  }}</a> <i style="color: darkgray;"> {{ user['entry_name'] }} </i></td>
+            {% if user['itb'] > 3.0  %} 
+                <td style="color:red">
+            {% else %}
+                <td>
+            {% endif %}
+            {{ user['sqaud_value']  }}/{{ user['itb'] }}
+            </td>
+            <td> {{ user['transfers']  }} (+{{ user['transfer_cost']  }})</td>
+            <td> 
+                {% if user['active_chip'] != None %}
+                {{ user['active_chip']  }}
+                {% endif %}
+            </td>
+            <td> {{ user['last_gw_points']  }}</td>
+            <td> {{ user['event_total']  }}</td>
+            <td> {{ user['total_points'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
