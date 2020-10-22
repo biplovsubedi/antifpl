@@ -29,7 +29,7 @@
                 {% endif %}
             
             </td>
-            <td> {{ user['last_gw_rank']  }}</td>
+            <td > {{ user['last_gw_rank']  }}</td>
             <td><a target="_blank"
                     href="https://fantasy.premierleague.com/entry/{{ user['entry'] }}/event/{{ gameweek }}">
                     {{ user['player_name']  }}</a> <i style="color: darkgray;"> {{ user['entry_name'] }} </i></td>
@@ -46,6 +46,7 @@
                 {{ user['active_chip']  }}
                 {% endif %}
             </td>
+            <!-- <td onclick="showSquadDetails( {{ user['entry'] }}, {{ gameweek }} )"> {{ user['last_gw_points']  }}</td> -->
             <td> {{ user['last_gw_points']  }}</td>
             <td> {{ user['event_total']  }}</td>
             <td> {{ user['total_points'] }}</td>
@@ -54,3 +55,4 @@
     </tbody>
 </table>
 {% endblock %}
+<script src="../static/js/script.js"></script>
