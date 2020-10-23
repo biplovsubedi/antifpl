@@ -10,9 +10,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
-
-    <title>{% block title %} {% endblock %}</title>
+    
+    <title>Anti FPL - {% block title %} {% endblock %}</title>
 </head>
 
 <body>
@@ -24,9 +23,9 @@
                 
         </div>
         <p class="" >
-            Please note that the final points here don't add the Inactive Players & Captain/Vice Captain Penalties. This gives you a decent understanding of your GW positon, but all final calculations will be available in the excel sheet. 
-            Bank Penalty (+25 points for >3.0 in the bank) and GW Transfer Costs are added you to Total Points.
-            <br>
+            Please note that this is still under development and might have some errors. 
+            This gives you a decent understanding of your GW positon, but all final calculations will be available in the excel sheet. 
+            <br>Bank Penalty (+25 points for >3.0 in the bank), C/VC not playing (+15 ), less than 11 inactive players(+9 per players), and GW Transfer Costs are added you to Total Points.
             You can sort by any column, or search for any criteria.
         </p>
         {% block content %} {% endblock %}
@@ -51,7 +50,7 @@
         $(document).ready(function () {
             $('#dtBasicExample').DataTable({
                 "order": [
-                    [9, "asc"]
+                    [1, "asc"]
                 ],
                 "pageLength": 50
             });
