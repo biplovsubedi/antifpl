@@ -85,7 +85,7 @@ def find_current_gw():
     # 4500s / 75min after the GW deadline
     # GW deadline is roughly 90min / 5400s before first fixture
     for f in fixture_d:
-        if f['deadline_time_epoch'] + 4500 > epoch_time:
+        if f['deadline_time_epoch'] + 5400 > epoch_time:
             return f['id'] - 1
     return 0
 
@@ -106,7 +106,7 @@ def is_gw_completed(gw):
     bootstrap_static = request_data_from_url(url_bootstrap_static)
     try:
         events = bootstrap_static['events']
-    except KeyError:
+    except:
         return False
 
     for ev in events:
