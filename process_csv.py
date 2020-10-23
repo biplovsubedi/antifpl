@@ -1,3 +1,14 @@
+""" 
+This file is used to process the CSV file containing the previous GW
+information for each manager. 
+CSV file extracted from the google sheets
+
+Convert to a JSON file that has manager's id, rank, points, name for 
+that gameweek. 
+
+"""
+
+
 import csv
 import json
 
@@ -9,6 +20,25 @@ manager_id_file = "src/data/manager_id_mapping.json"
 
 
 def read_csv(gw):
+    """Read the csv file containing GW data
+
+    Convert that CSV to python dict
+    Format:
+    {
+       "1471816": {
+        "points": 280,
+        "name": "Some name",
+        "rank": 131
+        }, 
+        ....
+    }
+
+    Args:
+        gw (int): gameweek
+
+    Returns:
+        dict: manager id(k) dict of points, name, rank (v)
+    """
 
     data = {}
 
@@ -23,11 +53,24 @@ def read_csv(gw):
 
 
 def read_manager_id():
+    """Read the file that contains manager's name (k), id(v)
+
+    Returns:
+        dict: file data
+    """
     with open(manager_id_file, 'r') as jfile:
         return json.loads(jfile.read())
 
 
 def create_gw_json(gw):
+    """Convert the CSV dict data to the required format
+
+    Extracting: points, name, rank
+    Join the 2 dicts (gw_info, manager_id on manager name)
+
+    Args:
+        gw ([type]): [description]
+    """
     gw_res = read_csv(gw)
     manager_id_dict = read_manager_id()
 

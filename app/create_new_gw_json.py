@@ -5,19 +5,32 @@ gw_standings_file = "data/gw_standings/standings_{gw}.json"
 final_gw_jsons = "data/gw_jsons/gw_{gw}.json"
 
 
-def read_last_gw_data(gw):
+def read_current_gw_data(gw):
+    """Get the data for the current gameweek
+
+    """
     with(open(gw_standings_file.format(gw=gw), 'r')) as f:
         return json.loads(f.read())
 
 
 def write_new_gw_data(gw, data):
+    """Write filtered information of a gw
+    This data is used a base for next gameweek
+
+    """
     with(open(final_gw_jsons.format(gw=gw), 'w')) as f:
         f.write(json.dumps(data))
 
 
 def process_new_gw_file(gw):
+    """Extract the manager id, points, and rank
+    from the current gameweek and store only these
+    information to the new file 
 
-    last_gw = read_last_gw_data(gw)
+    Args:
+        gw ([type]): [description]
+    """
+    last_gw = read_current_gw_data(gw)
 
     last_gw_data = last_gw['data']
     new_gw_data = {}
@@ -32,5 +45,9 @@ def process_new_gw_file(gw):
 
 
 if __name__ == "__main__":
+    """Specify the gameweek number to process the file on
+
+    Example: python create_new_gw_json.py 5
+    """
     gw = sys.argv[1]
     process_new_gw_file(int(gw))

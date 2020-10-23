@@ -1,3 +1,10 @@
+"""
+Web Application to keep track of anti fantasy points. 
+
+Main File of the flask application. Implements a route to / 
+
+"""
+
 from flask import Flask, render_template
 import requests
 import json
@@ -10,12 +17,19 @@ from operator import itemgetter
 
 app = Flask(__name__)
 
+
+# Api endpoints for fpl
+# Returns the gw points and other details of max 50 users as a page
 url_standings_base = "https://fantasy.premierleague.com/api/leagues-classic/307809/standings/?page_standings="
+# Returns the live points of all the players in that gw
 url_live_gw = "https://fantasy.premierleague.com/api/event/{gw}/live/"
+# Returns the gw picks for a manager in a gw
 url_gw_picks = "https://fantasy.premierleague.com/api/entry/{entry}/event/{gw}/picks/"
+# Returns almost everything about FPL (Here it is used to check if a GW has been completed or not)
 url_bootstrap_static = "https://fantasy.premierleague.com/api/bootstrap-static/"
 
-
+# Contains the date of each gameweek (with deadline)
+# TODO Rename to GW
 fixture_date_file = 'app/data/fixtures_date.json'
 
 
@@ -23,11 +37,20 @@ fixture_date_file = 'app/data/fixtures_date.json'
 Endpoints:
 https://fantasy.premierleague.com/api/entry/4621202/event/4/picks/  -> See picks for a player in a week
 History of a player: https://fantasy.premierleague.com/api/entry/4621202/history/
-
 """
 
 
 def request_data_from_url(url):
+    """Takes a url as an input and fetches JSON data
+    to that URL
+    Converts JSON to dictionary and returns that to the user.format()
+
+    Args:
+        url (string): Complete url of API endpoint
+
+    Returns:
+        dict: api response data, None if error
+    """
     try:
         res = requests.get(url)
     except:
@@ -39,12 +62,28 @@ def request_data_from_url(url):
 
 
 def find_current_gw():
+    """Find the gameweek corresponding to the request time
+    Uses gameweek fixtures file to match current time to the gw
+    {
+        "id": 3,
+        "name": "Gameweek 3",
+        "deadline_time": "2020-09-26T10:00:00Z",
+        "deadline_time_epoch": 1601114400
+    }
+    Smallest unit in epoch time is seconds. 
+
+    Returns:
+        int: Gamweeek corresponding to the request time, 0 if invalid
+    """
     with open(fixture_date_file, 'r') as file:
         fixtures = file.read()
 
     epoch_time = calendar.timegm(time.gmtime())
     fixture_d = json.loads(fixtures)
 
+    # TODO verify that this delay works
+    # 4500s / 75min after the GW deadline
+    # GW deadline is roughly 90min / 5400s before first fixture
     for f in fixture_d:
         if f['deadline_time_epoch'] + 4500 > epoch_time:
             return f['id'] - 1
@@ -52,6 +91,17 @@ def find_current_gw():
 
 
 def is_gw_completed(gw):
+    """Checks if a certain gameweek has been completed or not
+    bootstrap_static contains the GW information in key 'events'
+    Each gameweek has 2 parameters 'finished' and 'data_checked'. 
+    GW is considered completed after both these parameters are set to True
+
+    Args:
+        gw (int): gameweek no
+
+    Returns:
+        bool: True if Completed, False Otherwise
+    """
 
     bootstrap_static = request_data_from_url(url_bootstrap_static)
     try:
@@ -66,6 +116,17 @@ def is_gw_completed(gw):
 
 
 def get_last_gw_standings(gw):
+    """Returns the points/rank information from last gameweek
+    This info is used to compare the perfomance of a player in 
+    a certain GW, compared to the last one.
+
+    Reads the GW file and returns it. 
+    Args:
+        gw (int): gameweek no
+
+    Returns:
+        dictionary: last gw points, empty if not found
+    """
 
     last_gw_file = "app/data/gw_jsons/gw_" + str(gw) + ".json"
 
@@ -78,6 +139,24 @@ def get_last_gw_standings(gw):
 
 
 def dump_json_with_time(gw, data, gw_completed):
+    """Takes a python datatype and converts it to JSON
+    Adds extra meta information around gameweek, updated time and gw status
+    gameweek -> used to compare is new gameweek has started 
+    updated -> To reduce the number of API calls. The file is only
+        updated and new API call is made if the new request is beyond
+        a certain threshold limit past updated time (current: 200 s)
+    status -> To stop the update of certain gw after the gw has been 
+        completed. Values: ('completed' / 'ongoing')
+
+
+    Args:
+        gw (int): gameweek 
+        data (dict): data to be saved
+        gw_completed (bool): Whether the GW has been completed or not
+
+    Returns:
+        dict: dict that has been saved
+    """
     location = ['app/data/gw_standings/standings_{gw}.json'.format(
         gw=gw), 'app/data/gw_standings/standings_current.json']
     epoch_time = calendar.timegm(time.gmtime())
@@ -95,6 +174,18 @@ def dump_json_with_time(gw, data, gw_completed):
 
 
 def find_captains(picks):
+    """Find the Captain/Vice Captain picks for a fpl manager
+        in a gameweek. 
+    picks dictionary has a 'picks' key which contains the list of 
+    selected players for a gw, and their position/captaincy
+    Loop in the list and find the player(s) with armband
+
+    Args:
+        picks (dict): gameweek picks for a manager
+
+    Returns:
+        tuple: id of captain, vice captain
+    """
     # Find the captains and vice captains for the gw
     captain, vice_captain = None, None
     for player in picks['picks']:
@@ -107,6 +198,38 @@ def find_captains(picks):
 
 
 def filter_all_gw_picks(gw, complete_gw_picks):
+    """Filter unnecesssary information from a GW picks for a manager
+    GW picks has lot of details including, all players, GW stats for 
+    a manager. 
+    Since this is used multiple times, to compute penalties, we filter
+    the necessary information only.
+
+    Return format:
+    {
+        'manager_id' : {
+            "active_chip": 'wildcard' ,
+            "itb": 2.2,
+            "squad_value": 98.2,
+            "transfer_cost": 4,
+            "transfers": 2,
+            "captains": (2,56)
+        }
+    }
+
+    Args:
+        gw (int): gameweek
+        complete_gw_picks (dict): Contains the entire information about
+        the gw picks for each manager
+        Format:
+        {
+            'manager_id1' : picks,
+            'manager_id2' : picks,
+            ...
+        }
+
+    Returns:
+        dict: filtered information on the gw pick
+    """
     filtered_gw_picks = {}
     for player, picks in complete_gw_picks.items():
         filtered_gw_picks[player] = {
@@ -123,6 +246,25 @@ def filter_all_gw_picks(gw, complete_gw_picks):
 
 
 def fetch_pick_for_all_players(gw, gw_standings):
+    """For all the players in the league, find their respective
+    gameweek picks. 
+    This information is used to find captains/vice captains, bank/squad value,
+    weekly players pick, calcualte penalties. 
+
+    Return Format:
+    {
+        'manager_id1' : picks,
+        'manager_id2' : picks,
+        ...
+    }
+
+    Args:
+        gw (int): gameweek
+        gw_standings (dict): list of FPL managers in the mini league
+
+    Returns:
+        dict: Contains the gw picks information for all managers
+    """
     complete_gw_picks = {}
     for player in gw_standings:
         entry_id = player['entry']
@@ -141,7 +283,16 @@ def fetch_pick_for_all_players(gw, gw_standings):
 
 
 def process_gw_player_teams(gw, gw_standings):
-    print("Loading gw picks for all the users")
+    """Starts the process to load the gw picks for all managers
+    Checks if has already been done, return the file if available
+
+    Args:
+        gw (int): gameweek
+        gw_standings (list): List of all managers in the ML
+
+    Returns:
+        dict: Filtered GW picks for all managers
+    """
     complete_gw_picks = {}
 
     try:
@@ -157,6 +308,16 @@ def process_gw_player_teams(gw, gw_standings):
 
 
 def get_gw_teams_players(gw, gw_standings):
+    """Find the gw picks (filtered for all managers)
+    Checks if the file exists, else calls the function to create it
+
+    Args:
+        gw (int): gameweek
+        gw_standings (list): list of all managers in the ML
+
+    Returns:
+        dict: filtered dict on gw picks
+    """
     try:
         with(open(f'app/data/gw_teams/filtered/gw_filtered_{gw}.json', 'r')) as f:
             return json.loads(f.read())
@@ -165,6 +326,20 @@ def get_gw_teams_players(gw, gw_standings):
 
 
 def calculate_player_minutes(players):
+    """Extract the playing minutes for all players in a gw
+    Each player has a ton of stats in each GW, Only one that we need
+    for processing is the minutes. So we filter out unnecessary
+    information
+    GW minutes is used to compute inactive players penalties
+
+    Dictionary converstion is done to save lookup time O(N) -> O(1)
+
+    Args:
+        players (list): list of players' info for a GW
+
+    Returns:
+        dict: contains player's id(key) and mintues(val)
+    """
     ret_d = {}
     for p in players:
         ret_d[p['id']] = p['stats']['minutes']
@@ -172,6 +347,16 @@ def calculate_player_minutes(players):
 
 
 def get_gw_all_teams(gw):
+    """Return the file that contains the information of all managers, and 
+    their picks for a gw.format()
+
+
+    Args:
+        gw (int): gameweek 
+
+    Returns:
+        dict: file contents, {} if file does not exist
+    """
     try:
         with(open(f'app/data/gw_teams/all/gw_all_{gw}.json', 'r')) as f:
             return json.loads(f.read())
@@ -180,6 +365,20 @@ def get_gw_all_teams(gw):
 
 
 def find_inactive_players(picks, player_minutes):
+    """Find the number of inactive players for a certian manager
+    Loops in the manager picks (players) in a GW and checks if 
+    the player_minutes  
+    Find the count of players who are playing -> 'multiplier' != 0
+    and minutes != 0. 
+
+    Args:
+        picks (dict): Contains the information on the manager's GW picks
+        player_minutes (dict): Contains the minutes played by all 
+            players in that GW
+
+    Returns:
+        int: Number of starting XI players who didn't play in that GW
+    """
     active_cnt = 0
     for p in picks['picks']:
         if p['multiplier'] != 0 and player_minutes[p['element']] != 0:
@@ -188,6 +387,30 @@ def find_inactive_players(picks, player_minutes):
 
 
 def get_inactive_players_penalty(gw, gw_standings):
+    """Calculate the penalties for inactive players for each
+    manager in the mini league.
+    There are 2 sort of inactive penalties:
+    1. C/VC penalty -> C/VC failed to play (+15 Points) 
+    2. Inactive players pen -> Less than 11 players in the staring XI
+        player more than 0 minutes (+9 points per player)
+
+    Return Format:
+    {
+        'manager_id' : {
+            'cap_penalty' : 15,
+            'inactive_players' : 1,
+            'inactive_players_pen' : 9
+        },
+        ....
+    }
+
+    Args:
+        gw (int): gameweek
+        gw_standings (list): List of managers/info in the ML
+
+    Returns:
+        dict: Contains the managers(key) and penalties dict(val)
+    """
     # get gw players data
     gw_players_data = request_data_from_url(url_live_gw.format(gw=gw))
     try:
@@ -216,6 +439,30 @@ def get_inactive_players_penalty(gw, gw_standings):
 
 
 def process_total_gw(gw, gw_standings):
+    """Main function that processes all the GW information
+
+    Gets the information (points, rank) from the last gameweek
+    Gets the team value, transfer hits for all managers
+
+    Checks if the gw is completed:
+        Gets the C/VC, inactive players penalties for all managers
+
+    Note: C/VC, inactive players penalties only added after GW completed
+
+    For each player in the minileague, computes all of these information 
+
+    Sorts the list on the final points tally, creates rankings, and stores
+    this information as stadings_{gw} / standings_current JSON files.
+
+    NOTE: The returned list is used to create the table on the Front End
+
+    Args:
+        gw (int): gameweek
+        gw_standings (list): list of managers in the ML
+
+    Returns:
+        list: Contains the final informtion of all managers to be displayed
+    """
     last_gw_total = get_last_gw_standings(gw-1)
 
     # Get hits/captain/VC/Team Value
@@ -228,7 +475,6 @@ def process_total_gw(gw, gw_standings):
         inactive_players_penalties = get_inactive_players_penalty(
             gw, gw_standings)
 
-    print("gw completed", gw_completed_)
     # print(inactive_players_penalties)
 
     final_gw_total = []
@@ -310,9 +556,10 @@ def get_standings_list(url):
     """Return the list that contains the users and their points
 
     Args:
-        url ([type]): [description]
+        url (string): url corresponding to the milileage page
 
     Returns:
+        list: List of managers in that page of Mini league
     [{'id': 29643925, 'event_total': 23, 'player_name': 'Danny Wakeling', 'rank': 59, 'last_rank': 50, 'rank_sort': 59, 'total': 180, 'entry': 4505438, 'entry_name': 'Anti Stars'}]
     """
 
@@ -323,6 +570,13 @@ def get_standings_list(url):
 
 
 def dump_managers_id(standings):
+    """Utility function used to store the manager's name, id
+    Not used in the actual app, but used to map the managers from 
+    the google sheet CSV
+
+    Args:
+        standings (list): All managers in the ML
+    """
     d = {}
     for user in standings:
         d[user['player_name']] = user['entry']
@@ -333,6 +587,9 @@ def dump_managers_id(standings):
 
 def get_live_result():
     """Return the current state of all teams in the mini league
+
+    Note: At a time we can fetch 50 managers from a ML
+    Since we have 131 managers atm, we send paginated request 3 times
 
     Returns:
         dictionary : current points of all mini league teams
@@ -347,6 +604,25 @@ def get_live_result():
 
 
 def fetch_standings():
+    """Get the standings/data of all the managers to display in the app
+
+    Main function called from the react controller, to get the acutal
+    managers data
+
+    Checks if the standings_current file is available, else compute it
+
+    Finds if the status of gw in the file is completed or not
+        if yes, finds if the current gameweek is same as the one in the file
+        if yes, no futher computation required, return file data
+
+    Finds when the data in the file was updated
+        If less than 200 sec ago, return the data from the file 
+
+    Only compute new, if the above conditions don't satisfy
+
+    Returns:
+        list: List of managers data to be displayed
+    """
     # check if the data needs to be fetched // or stored json
     try:
         with open('app/data/gw_standings/standings_current.json', 'r') as file:
@@ -373,5 +649,13 @@ def fetch_standings():
 
 @app.route('/')
 def hello():
+    """Entry point for the flask app
+    Only route '/' is defined for now
+
+    Gets the managers' standings list and uses it to render the html
+
+    Returns:
+        html template: rendered HTML template with the standings data
+    """
     standings_data = fetch_standings()
     return render_template('index.html', standings=standings_data['data'], gameweek=standings_data['gameweek'], status=standings_data['status'])
