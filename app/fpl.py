@@ -13,12 +13,14 @@ app = Flask(__name__)
 url_standings_base = "https://fantasy.premierleague.com/api/leagues-classic/307809/standings/?page_standings="
 url_live_gw = "https://fantasy.premierleague.com/api/event/{gw}/live/"
 url_gw_picks = "https://fantasy.premierleague.com/api/entry/{entry}/event/{gw}/picks/"
+url_bootstrap_static = "https://fantasy.premierleague.com/api/bootstrap-static/"
+
 
 fixture_date_file = 'app/data/fixtures_date.json'
 
 
 """
-Endpoints: 
+Endpoints:
 https://fantasy.premierleague.com/api/entry/4621202/event/4/picks/  -> See picks for a player in a week
 History of a player: https://fantasy.premierleague.com/api/entry/4621202/history/
 
@@ -50,6 +52,20 @@ def find_current_gw():
     return 0
 
 
+def is_gw_completed(gw):
+
+    bootstrap_static = request_data_from_url(url_bootstrap_static)
+    try:
+        events = bootstrap_static['events']
+    except KeyError:
+        return False
+
+    for ev in events:
+        if ev['id'] == int(gw):
+            return ev['finished'] and ev['data_checked']
+    return False
+
+
 def get_last_gw_standings(gw):
 
     last_gw_file = "app/data/gw_jsons/gw_" + str(gw) + ".json"
@@ -62,14 +78,16 @@ def get_last_gw_standings(gw):
         return {}
 
 
-def dump_json_with_time(gw, data):
+def dump_json_with_time(gw, data, gw_completed):
     location = ['app/data/gw_standings/standings_{gw}.json'.format(
         gw=gw), 'app/data/gw_standings/standings_current.json']
     epoch_time = calendar.timegm(time.gmtime())
+
     new_dict = {
         'gameweek': gw,
         'updated': epoch_time,
-        'data': data
+        'data': data,
+        'status': 'completed' if gw_completed else 'ongoing'
     }
     for l in location:
         with open(l, 'w') as file:
@@ -105,6 +123,21 @@ def filter_all_gw_picks(gw, complete_gw_picks):
     return filtered_gw_picks
 
 
+def fetch_pick_for_all_players(gw, gw_standings):
+    complete_gw_picks = {}
+    for player in gw_standings:
+            entry_id = player['entry']
+        picks = request_data_from_url(
+            url_gw_picks.format(entry=entry_id, gw=gw))
+        if picks != None:
+            complete_gw_picks[entry_id] = picks
+            
+    # Save complete gw teams
+    with(open(f'app/data/gw_teams/all/gw_all_{gw}.json', 'w')) as f:
+        f.write(json.dumps(complete_gw_picks))
+        
+    return complete_gw_picks
+
 def process_gw_player_teams(gw, gw_standings):
     print("Loading gw picks for all the users")
     complete_gw_picks = {}
@@ -116,17 +149,7 @@ def process_gw_player_teams(gw, gw_standings):
     except FileNotFoundError:
         pass
 
-    # fetch the picks for each player
-    for player in gw_standings:
-        entry_id = player['entry']
-        picks = request_data_from_url(
-            url_gw_picks.format(entry=entry_id, gw=gw))
-        if picks != None:
-            complete_gw_picks[entry_id] = picks
-
-    # Save complete gw teams
-    with(open(f'app/data/gw_teams/all/gw_all_{gw}.json', 'w')) as f:
-        f.write(json.dumps(complete_gw_picks))
+    complete_gw_picks = fetch_pick_for_all_players(gw, gw_standings)
 
     return filter_all_gw_picks(gw, complete_gw_picks)
 
@@ -139,11 +162,64 @@ def get_gw_teams_players(gw, gw_standings):
         return process_gw_player_teams(gw, gw_standings)
 
 
+def calculate_player_minutes(players):
+    ret_d = {}
+    for p in players:
+        ret_d[p['id']] = p['stats']['minutes']
+    return ret_d
+
+
+def get_gw_all_teams(gw):
+    try:
+        with(open(f'app/data/gw_teams/all/gw_all_{gw}.json', 'r')) as f:
+            return json.loads(f.read())
+    except FileNotFoundError:
+        return {}
+
+def find_inactive_players(picks, player_minutes):
+    active_cnt = 0
+    for p in picks['picks']:
+        if p['multiplier'] != 0 and player_minutes[p['element']] != 0:
+            active_cnt += 1
+    return 11 - active_cnt
+            
+
+def get_inactive_players_penalty(gw, gw_standings):
+    # get gw players data
+    gw_players_data = request_data_from_url(url_live_gw.format(gw=gw))
+    try:
+        data = gw_players_data['elements']
+    except KeyError:
+        return {}
+    player_minutes = calculate_player_minutes(data)
+    gw_teams_all = fetch_pick_for_all_players(gw, gw_standings)
+
+    ret_d = {}
+    for id, picks in gw_teams_all.items():
+        cap, vc = find_captains(picks)
+        if player_minutes[cap] == 0 and player_minutes[vc] == 0:
+            ret_d[id]['cap_penalty'] = 15
+        else:
+            ret_d[id]['cap_penalty'] = 0
+        
+        inactive_players = find_inactive_players(picks, player_minutes)
+        ret_d[id]['inactive_players'] = inactive_players
+        ret_d[id]['inactive_players_pen'] = 9 * inactive_players
+    
+    return ret_d
+        
+
 def process_total_gw(gw, gw_standings):
     last_gw_total = get_last_gw_standings(gw-1)
 
     # Get hits/captain/VC/Team Value
     players_gw_teams = get_gw_teams_players(gw, gw_standings)
+
+    # check if gw is completed
+    inactive_players_penalties = {}
+    gw_completed_ = is_gw_completed(gw)
+    if(gw_completed_):
+        inactive_players_penalties = get_inactive_players_penalty(gw, gw_standings)
 
     final_gw_total = []
     for player in gw_standings:
@@ -169,6 +245,15 @@ def process_total_gw(gw, gw_standings):
             }
 
         try:
+            cap_penalty = inactive_players_penalties[str(player['entry'])]['cap_penalty']
+            inactive_players = inactive_players_penalties[str(player['entry'])]['inactive_players']
+            inactive_players_pen = inactive_players_penalties[str(player['entry'])]['inactive_players_pen']
+        except:
+            cap_penalty = ''
+            inactive_players = ''
+            inactive_players_pen = ''
+
+        try:
             bank_penalty = 0
             if gw_pick['itb'] > 3.0:
                 bank_penalty = 25
@@ -189,6 +274,10 @@ def process_total_gw(gw, gw_standings):
                 "transfer_cost": gw_pick["transfer_cost"],
                 "captains": gw_pick["captains"],
                 "transfers": gw_pick["transfers"],
+                "cap_penalty" : cap_penalty,
+                "inactive_players" : inactive_players,
+                'inactive_players_pen' : inactive_players_pen
+                
             })
         except KeyError:
             pass
@@ -199,8 +288,8 @@ def process_total_gw(gw, gw_standings):
     for i, item in enumerate(final_gw_total):
         item['rank'] = i+1
 
-    # dump data to gw_standings
-    return dump_json_with_time(gw, final_gw_total)
+    # dump data to gw_standings and status == finished
+    return dump_json_with_time(gw, final_gw_total, gw_completed and inactive_players_penalties != {})
 
 
 def get_standings_list(url):
@@ -252,6 +341,12 @@ def fetch_standings():
         return get_live_result()
 
     updated = data['updated']
+    status = data['status']
+    gameweek = data['gameweek']
+    
+    if status == 'completed' and gameweek == find_current_gw():
+        return data
+                
     current = calendar.timegm(time.gmtime())
 
     if current - updated < 200:
@@ -262,4 +357,4 @@ def fetch_standings():
 @app.route('/')
 def hello():
     standings_data = fetch_standings()
-    return render_template('index.html', standings=standings_data['data'], gameweek=standings_data['gameweek'])
+    return render_template('index.html', standings=standings_data['data'], gameweek=standings_data['gameweek'], status=standings_data['status'])
