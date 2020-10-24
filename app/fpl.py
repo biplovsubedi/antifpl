@@ -13,6 +13,9 @@ import calendar
 import time
 
 from operator import itemgetter
+from app.fixtures import fixtures
+
+from app.manager_id_name import managers_name, managers_entry
 
 
 app = Flask(__name__)
@@ -75,17 +78,17 @@ def find_current_gw():
     Returns:
         int: Gamweeek corresponding to the request time, 0 if invalid
     """
-    with open(fixture_date_file, 'r') as file:
-        fixtures = file.read()
+    # with open(fixture_date_file, 'r') as file:
+    #     fixtures = file.read()
 
+    # fixture_d = json.loads(fixtures)
     epoch_time = calendar.timegm(time.gmtime())
-    fixture_d = json.loads(fixtures)
 
     # TODO verify that this delay works
     # 4500s / 75min after the GW deadline
     # GW deadline is roughly 90min / 5400s before first fixture
-    for f in fixture_d:
-        if f['deadline_time_epoch'] + 5400 > epoch_time:
+    for f in fixtures:
+        if f['deadline_time_epoch'] + 4500 > epoch_time:
             return f['id'] - 1
     return 0
 
@@ -113,6 +116,23 @@ def is_gw_completed(gw):
         if ev['id'] == int(gw):
             return ev['finished'] and ev['data_checked']
     return False
+
+
+def get_gw_players_data(gw):
+    """Get data of the players in a given gameweek
+    Used to find players' points, minutes, etc
+
+    Args:
+        gw ([type]): [description]
+
+    Returns:
+        [type]: [description]
+    """
+    gw_players_data = request_data_from_url(url_live_gw.format(gw=gw))
+    try:
+        return gw_players_data['elements']
+    except KeyError:
+        return {}
 
 
 def get_last_gw_standings(gw):
@@ -325,7 +345,7 @@ def get_gw_teams_players(gw, gw_standings):
         return process_gw_player_teams(gw, gw_standings)
 
 
-def calculate_player_minutes(players):
+def calculate_player_minutes(gw):
     """Extract the playing minutes for all players in a gw
     Each player has a ton of stats in each GW, Only one that we need
     for processing is the minutes. So we filter out unnecessary
@@ -335,14 +355,41 @@ def calculate_player_minutes(players):
     Dictionary converstion is done to save lookup time O(N) -> O(1)
 
     Args:
-        players (list): list of players' info for a GW
+        gw (int): gameweek
 
     Returns:
         dict: contains player's id(key) and mintues(val)
     """
+
+    players = get_gw_players_data(gw)
+
     ret_d = {}
     for p in players:
         ret_d[p['id']] = p['stats']['minutes']
+    return ret_d
+
+
+def calculate_player_points(gw):
+    """Extract the playing points for all players in a gw
+    Each player has a ton of stats in each GW, Only one that we need
+    for processing is the points. So we filter out unnecessary
+    information
+    GW points is used to compute inactive players penalties
+
+    Dictionary converstion is done to save lookup time O(N) -> O(1)
+
+    Args:
+        gw (int): gameweek
+
+    Returns:
+        dict: contains player's id(key) and mintues(val)
+    """
+
+    players = get_gw_players_data(gw)
+
+    ret_d = {}
+    for p in players:
+        ret_d[p['id']] = p['stats']['total_points']
     return ret_d
 
 
@@ -412,12 +459,7 @@ def get_inactive_players_penalty(gw, gw_standings):
         dict: Contains the managers(key) and penalties dict(val)
     """
     # get gw players data
-    gw_players_data = request_data_from_url(url_live_gw.format(gw=gw))
-    try:
-        data = gw_players_data['elements']
-    except KeyError:
-        return {}
-    player_minutes = calculate_player_minutes(data)
+    player_minutes = calculate_player_minutes(gw)
 
     fetch_pick_for_all_players(gw, gw_standings)
     gw_teams_all = get_gw_all_teams(gw)
@@ -438,7 +480,7 @@ def get_inactive_players_penalty(gw, gw_standings):
     return ret_d
 
 
-def process_total_gw(gw, gw_standings):
+def process_total_gw(gw, gw_standings, gw_completed_=False):
     """Main function that processes all the GW information
 
     Gets the information (points, rank) from the last gameweek
@@ -470,7 +512,6 @@ def process_total_gw(gw, gw_standings):
 
     # check if gw is completed
     inactive_players_penalties = {}
-    gw_completed_ = is_gw_completed(gw)
     if(gw_completed_):
         inactive_players_penalties = get_inactive_players_penalty(
             gw, gw_standings)
@@ -585,6 +626,63 @@ def dump_managers_id(standings):
         f.write(json.dumps(d))
 
 
+def calculate_live_points(players, points):
+
+    count = 0
+    for p in players:
+        count += p["multiplier"] * points[p["element"]]
+    return count
+
+
+def get_live_points(gw):
+
+    points = calculate_player_points(gw)
+    all_teams = get_gw_all_teams(gw)
+
+    last_gw_total = get_last_gw_standings(gw-1)
+    final_gw_total = []
+    for manager_id, gw_data in all_teams.items():
+
+        try:
+            last_gw_points = last_gw_total[str(manager_id)]['points']
+            last_gw_rank = last_gw_total[str(manager_id)]['rank']
+        except KeyError:
+            last_gw_points = 0
+            last_gw_rank = ''
+
+        gw_points = calculate_live_points(gw_data["picks"], points)
+        bank_penalty = 25 if gw_data["entry_history"]["bank"] > 30 else 0
+        gw_points_with_pen = gw_points + bank_penalty + \
+            gw_data["entry_history"]["event_transfers_cost"]
+        total_points = last_gw_points + gw_points_with_pen
+
+        manager_d = {
+            'player_name':  managers_name[manager_id],
+            'entry_name':  managers_entry[manager_id],
+            'entry':  int(manager_id),
+            'event_total': gw_points,
+            'last_gw_points': last_gw_points,
+            'last_gw_rank': last_gw_rank,
+            'final_gw_points': gw_points_with_pen,
+            'total_points': total_points,
+            "active_chip": gw_data["active_chip"],
+            "itb": float(gw_data["entry_history"]["bank"])/10.0,
+            "sqaud_value": float(gw_data["entry_history"]["value"])/10.0,
+            "transfer_cost": gw_data["entry_history"]["event_transfers_cost"],
+            "transfers": gw_data["entry_history"]["event_transfers"]
+        }
+        final_gw_total.append(manager_d)
+
+    # sort the list
+    final_gw_total = sorted(final_gw_total, key=itemgetter('total_points'))
+    # Add rank value
+    for i, item in enumerate(final_gw_total):
+        item['rank'] = i+1
+
+    # dump data to gw_standings and status == finished
+    return dump_json_with_time(gw, final_gw_total, False)
+
+
 def get_live_result():
     """Return the current state of all teams in the mini league
 
@@ -595,12 +693,19 @@ def get_live_result():
         dictionary : current points of all mini league teams
     """
 
+    gw = find_current_gw()
+    gw_completed_ = is_gw_completed(gw)
+
     standings_list = []
+
+    if not gw_completed_:
+        return get_live_points(gw)
+
     for i in range(1, 4):
         res = get_standings_list(f"{url_standings_base}{i}")
         standings_list.extend(res)
     # dump_managers_id(standings_list)
-    return process_total_gw(find_current_gw(), standings_list)
+    return process_total_gw(gw, standings_list, gw_completed_)
 
 
 def fetch_standings():
@@ -642,7 +747,7 @@ def fetch_standings():
 
     current = calendar.timegm(time.gmtime())
 
-    if current - updated < 200:
+    if current - updated < 500:
         return data
     return get_live_result()
 
