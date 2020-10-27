@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
-    
+    <link rel="stylesheet" href="../static/css/custom.css">
     <title>Anti FPL - {% block title %} {% endblock %}</title>
 </head>
 
@@ -22,12 +22,7 @@
             <h1>Anti Fantasy Premier League</h1>
                 
         </div>
-        <p class="" >
-            Please note that this is <b>still under development</b> and<u> might have some errors </u>. 
-            This gives you a decent understanding of your GW positon, but all final calculations will be<b> available in the excel sheet</b>. 
-            <br>Bank Penalty (+25 points for >3.0 in the bank), C/VC not playing (+15 ), less than 11 inactive players(+9 per players), and GW Transfer Costs are added to your Total Points.
-            You can sort by any column, or search for any criteria.
-        </p>
+        
         {% block content %} {% endblock %}
     </div>
 
