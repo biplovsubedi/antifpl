@@ -39,7 +39,7 @@ def process_new_gw_file(gw):
         d_['name'] = p['player_name']
         d_['points'] = p['total_points']
         d_['rank'] = p['rank']
-        new_gw_data[p["id"]] = d_
+        new_gw_data[p["entry"]] = d_
 
     write_new_gw_data(gw, new_gw_data)
 
