@@ -27,6 +27,7 @@
 
 .playerbox {
     background-color: transparent;
+    box-shadow: black;
     /* height: 50px; */
 }
 

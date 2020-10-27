@@ -619,8 +619,16 @@ def fetch_dream_team(gw):
 
 def get_dream_team(gw=None):
     # find gw
-    if gw == None:
-        gw = find_current_gw()
+
+    curr_gw_ = find_current_gw()
+    try:
+        gw = int(gw)
+    except:
+        gw = curr_gw_
+
+    if gw == None or int(gw) >= int(curr_gw_) or int(gw) < 1:
+        gw = curr_gw_
+
     current = calendar.timegm(time.gmtime())
     try:
         with(open(f'app/data/dream/{gw}.json', 'r')) as f:
@@ -942,7 +950,7 @@ def dream_team():
                            dteam=final_dict['data'][0],
                            hmention=final_dict['data'][1],
                            gameweek=final_dict['gameweek'],
-                           gameweeks=final_dict['gameweek'],
+                           gameweeks=int(final_dict['gameweek']),
                            status="Completed" if final_dict['completed'] == True else "Ongoing")
 
 
