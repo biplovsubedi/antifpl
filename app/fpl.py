@@ -523,13 +523,16 @@ def get_players_metadata():
 
     players_dict = {}
     for p in bootstrap_static_data['elements']:
-        players_dict[int(p['id'])] = {
+        try:
+            team = teams_data[p['team']]
+        except KeyError:
+            team = teams_data[str(p['team'])]
+        players_dict[p['id']] = {
             'position': p['element_type'],
-            'first_name': p['first_name'],
-            'second_name': p['second_name'],
-            'team_id': teams_data[p['team']],
-            'team_name': teams_data[p['team']]['name'],
-            'team_short_name': teams_data[p['team']]['short_name']
+            'web_name': p['web_name'],
+            'team_id': team,
+            'team_name': team['name'],
+            'team_short_name': team['short_name']
         }
     with(open('app/data/players_metadata.json', 'w')) as f:
         f.write(json.dumps(players_dict))
@@ -540,7 +543,6 @@ def fetch_dream_team(gw):
 
     # Find all the players in a GW
     players_points = calculate_player_points(gw, only_played=True)
-    print("points")
     players_metadata = get_players_metadata()
 
     # sort players points in ascending order -> cast to list
@@ -589,7 +591,7 @@ def fetch_dream_team(gw):
             # Add players with same points as the last person in dream to honorable mentions
             if len(dream_team[str(pos)]) > 0 and p[1] == dream_team[str(pos)][-1]['points']:
                 honorable_mentions[str(pos)].append({
-                    'name': player['first_name'] + " " + player['second_name'],
+                    'name': player['web_name'],
                     'points': p[1],
                     'team': player['team_short_name'],
                     'id': str(p[0])
@@ -604,7 +606,7 @@ def fetch_dream_team(gw):
         max_pos[pos] -= 1
 
         dream_team[str(pos)].append({
-            'name': player['first_name'] + " " + player['second_name'],
+            'name': player['web_name'],
             'points': p[1],
             'team': player['team_short_name'],
             'id': str(p[0])
@@ -612,7 +614,6 @@ def fetch_dream_team(gw):
         total_points += p[1]
 
     dream_team['total'] = total_points
-    print(max_pos)
     return (dream_team, honorable_mentions)
 
 
