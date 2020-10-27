@@ -941,6 +941,7 @@ def dream_team():
                            dteam=final_dict['data'][0],
                            hmention=final_dict['data'][1],
                            gameweek=final_dict['gameweek'],
+                           gameweeks=final_dict['gameweek'],
                            status="Completed" if final_dict['completed'] == True else "Ongoing")
 
 
@@ -950,5 +951,6 @@ def dream_team_gw(gw):
     return render_template('dreamteam.html',
                            dteam=final_dict['data'][0],
                            hmention=final_dict['data'][1],
-                           gameweek=find_current_gw(),
+                           gameweek=final_dict['gameweek'],
+                           gameweeks=find_current_gw(),
                            status="Completed" if final_dict['completed'] == True else "Ongoing")
