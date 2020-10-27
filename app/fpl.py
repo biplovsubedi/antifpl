@@ -81,7 +81,6 @@ def find_current_gw():
     """
     # with open(fixture_date_file, 'r') as file:
     #     fixtures = file.read()
-
     # fixture_d = json.loads(fixtures)
     epoch_time = calendar.timegm(time.gmtime())
 
@@ -581,41 +580,46 @@ def fetch_dream_team(gw):
         # find position
         pos = player['position']
 
-        is_def_mid_full = (pos == '2' or pos == '3') and len(
+        is_def_mid_full = (pos == 2 or pos == 3) and len(
             dream_team['2']) + len(dream_team['3']) == 9
         is_gk_remaining = len(dream_team['1']) == 0 and len(
             dream_team['2']) + len(dream_team['3']) + len(dream_team['4']) == 10
 
-        if (max_pos[pos]) == 0 or is_def_mid_full or (is_gk_remaining and pos != 1):
+        if (max_pos[pos]) == 0 or is_def_mid_full or (is_gk_remaining and pos != 1) or sum(max_pos) == 3:
             # Add players with same points as the last person in dream to honorable mentions
             if len(dream_team[str(pos)]) > 0 and p[1] == dream_team[str(pos)][-1]['points']:
                 honorable_mentions[str(pos)].append({
                     'name': player['first_name'] + " " + player['second_name'],
                     'points': p[1],
-                    'team': player['team_short_name']
+                    'team': player['team_short_name'],
+                    'id': str(p[0])
                 })
 
             continue
+        # All 11 players selected
+        # This is causing some players to miss out
+        if sum(max_pos) == 3:
+            continue
+
         max_pos[pos] -= 1
 
         dream_team[str(pos)].append({
             'name': player['first_name'] + " " + player['second_name'],
             'points': p[1],
-            'team': player['team_short_name']
+            'team': player['team_short_name'],
+            'id': str(p[0])
         })
         total_points += p[1]
 
-        # All 11 players selected
-        if sum(max_pos) == 3:
-            break
     dream_team['total'] = total_points
     print(max_pos)
     return (dream_team, honorable_mentions)
 
 
-def get_dream_team():
+def get_dream_team(gw=None):
     # find gw
-    gw = find_current_gw()
+    if gw == None:
+        gw = find_current_gw()
     current = calendar.timegm(time.gmtime())
     try:
         with(open(f'app/data/dream/{gw}.json', 'r')) as f:
@@ -937,4 +941,14 @@ def dream_team():
                            dteam=final_dict['data'][0],
                            hmention=final_dict['data'][1],
                            gameweek=final_dict['gameweek'],
+                           status="Completed" if final_dict['completed'] == True else "Ongoing")
+
+
+@app.route('/dream<gw>')
+def dream_team_gw(gw):
+    final_dict = get_dream_team(gw)
+    return render_template('dreamteam.html',
+                           dteam=final_dict['data'][0],
+                           hmention=final_dict['data'][1],
+                           gameweek=find_current_gw(),
                            status="Completed" if final_dict['completed'] == True else "Ongoing")

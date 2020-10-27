@@ -1,0 +1,394 @@
+{
+    "updated": 1603821543,
+    "data": [
+        {
+            "1": [
+                {
+                    "name": "Marek Rod\u00e1k",
+                    "points": 1,
+                    "team": "FUL",
+                    "id": "186"
+                }
+            ],
+            "2": [
+                {
+                    "name": "Pascal Struijk",
+                    "points": 0,
+                    "team": "LEE",
+                    "id": "211"
+                },
+                {
+                    "name": "Michael Hector",
+                    "points": 0,
+                    "team": "FUL",
+                    "id": "178"
+                },
+                {
+                    "name": "John Egan",
+                    "points": 0,
+                    "team": "SHU",
+                    "id": "353"
+                },
+                {
+                    "name": "Oluwasemilogo Adesewo Ibidapo Ajayi",
+                    "points": 0,
+                    "team": "WBA",
+                    "id": "419"
+                },
+                {
+                    "name": "Luke Ayling",
+                    "points": 0,
+                    "team": "LEE",
+                    "id": "197"
+                }
+            ],
+            "3": [
+                {
+                    "name": "Andriy Yarmolenko",
+                    "points": 0,
+                    "team": "WHU",
+                    "id": "436"
+                },
+                {
+                    "name": "Sander Berge",
+                    "points": 1,
+                    "team": "SHU",
+                    "id": "360"
+                },
+                {
+                    "name": "Alireza Jahanbakhsh",
+                    "points": 1,
+                    "team": "BHA",
+                    "id": "71"
+                }
+            ],
+            "4": [
+                {
+                    "name": "David McGoldrick",
+                    "points": 1,
+                    "team": "SHU",
+                    "id": "344"
+                },
+                {
+                    "name": "Bobby Decordova-Reid",
+                    "points": 1,
+                    "team": "FUL",
+                    "id": "181"
+                }
+            ],
+            "total": 5
+        },
+        {
+            "1": [
+                {
+                    "name": "Illan Meslier",
+                    "points": 1,
+                    "team": "LEE",
+                    "id": "213"
+                },
+                {
+                    "name": "Aaron Ramsdale",
+                    "points": 1,
+                    "team": "SHU",
+                    "id": "483"
+                },
+                {
+                    "name": "Alisson Ramses Becker",
+                    "points": 1,
+                    "team": "LIV",
+                    "id": "252"
+                },
+                {
+                    "name": "Lukasz Fabianski",
+                    "points": 1,
+                    "team": "WHU",
+                    "id": "431"
+                },
+                {
+                    "name": "Mathew Ryan",
+                    "points": 1,
+                    "team": "BHA",
+                    "id": "70"
+                }
+            ],
+            "2": [
+                {
+                    "name": "Ryan Fredericks",
+                    "points": 0,
+                    "team": "WHU",
+                    "id": "438"
+                },
+                {
+                    "name": "Robin Koch",
+                    "points": 0,
+                    "team": "LEE",
+                    "id": "491"
+                }
+            ],
+            "3": [
+                {
+                    "name": "Daniel Ceballos Fern\u00e1ndez",
+                    "points": 1,
+                    "team": "ARS",
+                    "id": "501"
+                },
+                {
+                    "name": "James Maddison",
+                    "points": 1,
+                    "team": "LEI",
+                    "id": "231"
+                },
+                {
+                    "name": "Pascal Gro\u00df",
+                    "points": 1,
+                    "team": "BHA",
+                    "id": "57"
+                },
+                {
+                    "name": "Moussa Djenepo",
+                    "points": 1,
+                    "team": "SOU",
+                    "id": "382"
+                },
+                {
+                    "name": "Marc Albrighton",
+                    "points": 1,
+                    "team": "LEI",
+                    "id": "221"
+                },
+                {
+                    "name": "Tyler Roberts",
+                    "points": 1,
+                    "team": "LEE",
+                    "id": "206"
+                },
+                {
+                    "name": "Pierre-Emile H\u00f8jbjerg",
+                    "points": 1,
+                    "team": "TOT",
+                    "id": "396"
+                },
+                {
+                    "name": "Sean Longstaff",
+                    "points": 1,
+                    "team": "NEW",
+                    "id": "480"
+                },
+                {
+                    "name": "Jamie Shackleton",
+                    "points": 1,
+                    "team": "LEE",
+                    "id": "210"
+                },
+                {
+                    "name": "Tom Davies",
+                    "points": 1,
+                    "team": "EVE",
+                    "id": "163"
+                },
+                {
+                    "name": "Vitor Ferreira",
+                    "points": 1,
+                    "team": "WOL",
+                    "id": "515"
+                },
+                {
+                    "name": "Harry Winks",
+                    "points": 1,
+                    "team": "TOT",
+                    "id": "397"
+                },
+                {
+                    "name": "Bamidele Alli",
+                    "points": 1,
+                    "team": "TOT",
+                    "id": "394"
+                },
+                {
+                    "name": "Curtis Jones",
+                    "points": 1,
+                    "team": "LIV",
+                    "id": "263"
+                },
+                {
+                    "name": "Steven Bergwijn",
+                    "points": 1,
+                    "team": "TOT",
+                    "id": "400"
+                },
+                {
+                    "name": "Nicolas P\u00e9p\u00e9",
+                    "points": 1,
+                    "team": "ARS",
+                    "id": "18"
+                },
+                {
+                    "name": "Adam Lallana",
+                    "points": 1,
+                    "team": "BHA",
+                    "id": "54"
+                },
+                {
+                    "name": "Ross Barkley",
+                    "points": 1,
+                    "team": "AVL",
+                    "id": "106"
+                },
+                {
+                    "name": "Gylfi Sigurdsson",
+                    "points": 1,
+                    "team": "EVE",
+                    "id": "150"
+                },
+                {
+                    "name": "Andr\u00e9-Frank Zambo Anguissa",
+                    "points": 1,
+                    "team": "FUL",
+                    "id": "191"
+                },
+                {
+                    "name": "Eberechi Eze",
+                    "points": 1,
+                    "team": "CRY",
+                    "id": "489"
+                },
+                {
+                    "name": "R\u00faben Diogo da Silva Neves",
+                    "points": 1,
+                    "team": "WOL",
+                    "id": "466"
+                },
+                {
+                    "name": "Luka Milivojevic",
+                    "points": 1,
+                    "team": "CRY",
+                    "id": "138"
+                },
+                {
+                    "name": "Kyle Edwards",
+                    "points": 1,
+                    "team": "WBA",
+                    "id": "421"
+                },
+                {
+                    "name": "Callum Hudson-Odoi",
+                    "points": 1,
+                    "team": "CHE",
+                    "id": "122"
+                },
+                {
+                    "name": "Rekeem Harper",
+                    "points": 1,
+                    "team": "WBA",
+                    "id": "426"
+                },
+                {
+                    "name": "Tanguy Ndombele",
+                    "points": 1,
+                    "team": "TOT",
+                    "id": "405"
+                },
+                {
+                    "name": "Felipe Anderson Pereira Gomes",
+                    "points": 1,
+                    "team": "WHU",
+                    "id": "440"
+                },
+                {
+                    "name": "Naby Keita",
+                    "points": 1,
+                    "team": "LIV",
+                    "id": "261"
+                },
+                {
+                    "name": "Tom Cairney",
+                    "points": 1,
+                    "team": "FUL",
+                    "id": "175"
+                },
+                {
+                    "name": "Moussa Sissoko",
+                    "points": 1,
+                    "team": "TOT",
+                    "id": "385"
+                }
+            ],
+            "4": [
+                {
+                    "name": "S\u00e9bastien Haller",
+                    "points": 1,
+                    "team": "WHU",
+                    "id": "441"
+                },
+                {
+                    "name": "Shane Long",
+                    "points": 1,
+                    "team": "SOU",
+                    "id": "361"
+                },
+                {
+                    "name": "Oliver McBurnie",
+                    "points": 1,
+                    "team": "SHU",
+                    "id": "357"
+                },
+                {
+                    "name": "Rodrigo Moreno",
+                    "points": 1,
+                    "team": "LEE",
+                    "id": "492"
+                },
+                {
+                    "name": "Joelinton C\u00e1ssio Apolin\u00e1rio de Lira",
+                    "points": 1,
+                    "team": "NEW",
+                    "id": "340"
+                },
+                {
+                    "name": "Hal Robson-Kanu",
+                    "points": 1,
+                    "team": "WBA",
+                    "id": "408"
+                },
+                {
+                    "name": "Moise Kean",
+                    "points": 1,
+                    "team": "EVE",
+                    "id": "169"
+                },
+                {
+                    "name": "Aaron Connolly",
+                    "points": 1,
+                    "team": "BHA",
+                    "id": "78"
+                },
+                {
+                    "name": "Roberto Firmino",
+                    "points": 1,
+                    "team": "LIV",
+                    "id": "249"
+                },
+                {
+                    "name": "Aleksandar Mitrovi\u0107",
+                    "points": 1,
+                    "team": "FUL",
+                    "id": "184"
+                },
+                {
+                    "name": "Callum Robinson",
+                    "points": 1,
+                    "team": "WBA",
+                    "id": "358"
+                },
+                {
+                    "name": "Edward Nketiah",
+                    "points": 1,
+                    "team": "ARS",
+                    "id": "22"
+                }
+            ]
+        }
+    ],
+    "completed": true,
+    "gameweek": 1
+}
