@@ -1,0 +1,83 @@
+.flex-container {
+    display: flex;
+    flex-wrap: nowrap;
+    background-color: green;
+}
+
+.flex-container>div {
+    background-color: #f1f1f1;
+    width: 500px;
+    margin: 10px;
+    text-align: center;
+    line-height: 75px;
+    font-size: 30px;
+}
+
+.footballpitch {
+    background-image: url("../images/pitch.png");
+    /* background-size: contain; */
+    background-color: #a5c9a6;
+    width: 1100px;
+    padding-top: 15px;
+    /* padding-left: 15px; */
+    /* margin: 10px; */
+
+    /* height: 500px; */
+}
+
+.playerbox {
+    background-color: transparent;
+    /* height: 50px; */
+}
+
+.clublogo {
+    height: 50px;
+}
+
+.clublogosmall {
+    height: 20px;
+}
+
+.playername {
+    background-color: darkslategrey;
+    color: white;
+    padding: 3px;
+    /* border-radius: 5px; */
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+}
+
+.playerpoints {
+    background-color: lightgoldenrodyellow;
+    padding: 3px;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+.breakplayers {
+    height: 20px;
+    padding: 5px;
+}
+
+#overlay1 {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    color: black;
+    font-size: 50px;
+    z-index: 1;
+    top: 70px;
+    left: 75px;
+}
+
+#base1 {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.totalpoints {
+    color: black;
+    font-size: 30px;
+    text-decoration-style: solid;
+}

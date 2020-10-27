@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+<style>
+
+</style>
+{% block content %}
+<h4>{% block title %} Dream XI - GW {{ gameweek }} ( {{ status }} ){% endblock %} - <a href="/">Points Table</a></h4>
+<div>
+<!-- <div  id="overlay1">{{ dteam['total'] }}</div> -->
+
+<p class="totalpoints">Total: <b> {{ dteam['total'] }} </b></p>
+
+<div id="base1" class="footballpitch" >
+
+    <!-- Goalkeeper -->
+    <div class="d-flex justify-content-around">
+    
+        <div class="p-2 playerbox">
+            <center>
+            <div class=""><img class="clublogo" src="../static/images/{{ dteam['1'][0]['team'] }}.png"/></div>
+            <div class="playername">{{ dteam['1'][0]['name'] }}</div>
+            <div class="playerpoints"><b>{{ dteam['1'][0]['points'] }}</b></div>
+            </center>
+        </div>
+        
+    </div>
+    <div class="breakplayers"></div>
+
+    <!-- Defenders -->
+    <div class="d-flex justify-content-around">
+
+        {% for def in dteam['2'] %}
+            <div class="p-2 playerbox">
+                <center>
+                <div class=""><img class="clublogo" src="../static/images/{{ def['team'] }}.png"/></div>
+                <div class="playername">{{ def['name'] }}</div>
+                <div class="playerpoints"><b>{{ def['points'] }}</b></div>
+                </center>
+            </div>
+
+        {% endfor %}
+
+    </div>
+    <div class="breakplayers"></div>
+
+    <!-- Midfielders -->
+    <div class="d-flex justify-content-around">
+
+        {% for def in dteam['3'] %}
+            <div class="p-2 playerbox">
+                <center>
+                <div class=""><img class="clublogo" src="../static/images/{{ def['team'] }}.png"/></div>
+                <div class="playername">{{ def['name'] }}</div>
+                <div class="playerpoints"><b>{{ def['points'] }}</b></div>
+                </center>
+            </div>
+
+        {% endfor %}
+    </div>
+
+    <div class="breakplayers"></div>
+
+
+    <!-- Forward -->
+    <div class="d-flex justify-content-around">
+
+        {% for def in dteam['4'] %}
+            <div class="p-2 playerbox">
+                <center>
+                <div class=""><img class="clublogo" src="../static/images/{{ def['team'] }}.png"/></div>
+                <div class="playername">{{ def['name'] }}</div>
+                <div class="playerpoints"><b>{{ def['points'] }}</b></div>
+                </center>
+            </div>
+
+        {% endfor %}
+    </div>
+</div>
+</div>
+<div class="breakplayers"></div>
+
+<h4>Honorable Mentions</h4>
+<div class="row">
+    <div class="col-md-3">
+        <h6>Goalkeepers</h6>
+        <table>
+            <tbody>
+                {% for gkp in hmention['1'] %}
+                <tr>
+                    <td><img class="clublogosmall" src="../static/images/{{ gkp['team'] }}.png"/></td>
+                    <td>{{ gkp['name'] }}</td>
+                    <td>{{ gkp['points'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>       
+    </div>
+    <div class="col-md-3">
+
+        <h6>Defenders</h6>
+        <table>
+            <tbody>
+                {% for def in hmention['2'] %}
+                <tr>
+                    <td><img class="clublogosmall" src="../static/images/{{ def['team'] }}.png"/></td>
+                    <td>{{ def['name'] }}</td>
+                    <td>{{ def['points'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>        
+    </div>    
+    <div class="col-md-3">
+        <h6>Midfielders</h6>
+        <table>
+            <tbody>
+                {% for mid in hmention['3'] %}
+                <tr>
+                    <td><img class="clublogosmall" src="../static/images/{{ mid['team'] }}.png"/></td>
+                    <td>{{ mid['name'] }}</td>
+                    <td>{{ mid['points'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+    <div class="col-md-3">
+
+        <h6>Forwards</h6>
+        <table>
+            <tbody>
+                {% for fwd in hmention['4'] %}
+                <tr>
+                    <td><img class="clublogosmall" src="../static/images/{{ fwd['team'] }}.png"/></td>
+                    <td>{{ fwd['name'] }}</td>
+                    <td>{{ fwd['points'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table> 
+    </div>
+</div>
+<div class="breakplayers"></div>
+<hr>
+<div class="breakplayers"></div>
+
+{% endblock %}
