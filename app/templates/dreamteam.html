@@ -4,9 +4,15 @@
 </style>
 {% block content %}
 <h4>{% block title %} Dream XI - GW {{ gameweek }} ( {{ status }} ){% endblock %} - <a href="/">Points Table</a></h4>
-<div>
-<!-- <div  id="overlay1">{{ dteam['total'] }}</div> -->
 
+<h5>Previous Dream Teams</h5>
+{% for gw in range(1, gameweek+1) %}
+    <a href="/dream{{ gw }}"><p style="display:inline">GW-{{ gw }}</p></a>
+{% endfor %}
+
+<div>
+<hr>
+<!-- <div  id="overlay1">{{ dteam['total'] }}</div> -->
 <p class="totalpoints">Total: <b> {{ dteam['total'] }} </b></p>
 
 <div id="base1" class="footballpitch" >
