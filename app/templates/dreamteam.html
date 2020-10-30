@@ -19,15 +19,18 @@
 
     <!-- Goalkeeper -->
     <div class="d-flex justify-content-around">
-    
-        <div class="p-2 playerbox">
-            <center>
-            <div class=""><img class="clublogo" src="../static/images/{{ dteam['1'][0]['team'] }}.png"/></div>
-            <div class="playername">{{ dteam['1'][0]['name'] }}</div>
-            <div class="playerpoints"><b>{{ dteam['1'][0]['points'] }}</b></div>
-            </center>
-        </div>
-        
+
+        {% for def in dteam['1'] %}
+            <div class="p-2 playerbox">
+                <center>
+                <div class=""><img class="clublogo" src="../static/images/{{ def['team'] }}.png"/></div>
+                <div class="playername">{{ def['name'] }}</div>
+                <div class="playerpoints"><b>{{ def['points'] }}</b></div>
+                </center>
+            </div>
+
+        {% endfor %}
+
     </div>
     <div class="breakplayers"></div>
 
