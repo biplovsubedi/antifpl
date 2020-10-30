@@ -27,6 +27,7 @@
 
 .playerbox {
     background-color: transparent;
+    box-shadow: black;
     /* height: 50px; */
 }
 
@@ -41,7 +42,7 @@
 .playername {
     background-color: darkslategrey;
     color: white;
-    padding: 3px;
+    padding: 5px 20px;
     /* border-radius: 5px; */
     border-top-left-radius: 7px;
     border-top-right-radius: 7px;
@@ -49,7 +50,7 @@
 
 .playerpoints {
     background-color: lightgoldenrodyellow;
-    padding: 3px;
+    padding: 1px 10px;
     border-bottom-left-radius: 7px;
     border-bottom-right-radius: 7px;
 }
