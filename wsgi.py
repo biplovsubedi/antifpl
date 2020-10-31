@@ -9,7 +9,7 @@ web: gunicorn wsgi:app
 Flask app in app.fpl 
 """
 
-from app.fpl import app
+from app.fpl import fplapp
 
 if __name__ == "__main__":
-    app.run()
+    fplapp.run()

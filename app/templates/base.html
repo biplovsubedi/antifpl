@@ -17,11 +17,27 @@
 <body>
  
     <div class="container">
-        <div class="navbar navbar-expand-md navbar-light bg-light">
+        <nav class="navbar navbar-expand-md navbar-light bg-light">
+
+        <div class="navbar-collapse collapse w-100 order-1 order-md-0 dual-collapse2">
             <!-- <a class="navbar-brand" href="{{ url_for('hello')}}">Anti Fantasy Premier League</a> -->
             <h1>Anti Fantasy Premier League</h1>
-                
+            
         </div>
+        <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Points</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/stats">GW Stats</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dream">Dream XI</a>
+                </li>
+            </ul>
+        </div>
+        </nav>
         
         {% block content %} {% endblock %}
     </div>
@@ -41,6 +57,9 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.9.0/js/anychart-core.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/8.9.0/js/anychart-treemap.min.js"></script>
+
     <script>
         $(document).ready(function () {
             $('#dtBasicExample').DataTable({
@@ -50,7 +69,17 @@
                 "pageLength": 50
             });
         });
+        $(document).ready(function () {
+            $('.dtSquad').DataTable({
+                "order": [
+                    [0, "desc"]
+                ],
+                "pageLength": 12
+            });
+        });
     </script>
+
+    
 </body>
 
 </html>

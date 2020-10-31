@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h4>{% block title %} GW {{ gameweek }} ( {{ status }} ){% endblock %} - <a href="/">Points Table</a> -  <a href="/dream">Dream Team</a></h4>
+<p class="" >
+    Statistics for Anti FPL Selection
+</p>
+<center><h3>Most Popular</h3></center>
+<hr>
+<div class="row">
+    <div class="col-md-5">
+    <h5>Starting XI</h5>
+    <hr>
+    <table class="dtSquad table table-striped  table-sm" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th></th>
+            <th>Mins</th>
+            <th>Pts</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for player in data['starting_xi'] %}
+        <tr>
+            <td>{{ player['selection'] }}</td>
+            <td>{{ player['name'] }}</td>
+            <td><img class="clublogosmall" src="../static/images/{{ player['team'] }}.png"/> {{ player['team'] }}</td>
+            <td>{{ player['minutes'] }}</td>
+            <td>{{ player['points'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+ 
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-5">
+    <h5>Overall Squad</h5>   
+    <hr> 
+    <table class="dtSquad table table-striped  table-sm" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th></th>
+                <th>Mins</th>
+                <th>Pts</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in data['squad_xv'] %}
+            <tr>
+                <td>{{ player['selection'] }}</td>
+                <td>{{ player['name'] }}</td>
+                <td><img class="clublogosmall" src="../static/images/{{ player['team'] }}.png"/> {{ player['team'] }}</td>
+                <td>{{ player['minutes'] }}</td>
+                <td>{{ player['points'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+</div>
+
+<hr>
+<center><h3>Armband</h3></center>
+<hr>
+<div class="row">
+    <div class="col-md-5">
+    <h5>Captaincy Pics</h5>
+    <hr>
+    <table class="dtSquad table table-striped  table-sm" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th></th>
+            <th>Mins</th>
+            <th>Pts</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for player in data['captains'] %}
+        <tr>
+            <td>{{ player['selection'] }}</td>
+            <td>{{ player['name'] }}</td>
+            <td><img class="clublogosmall" src="../static/images/{{ player['team'] }}.png"/> {{ player['team'] }}</td>
+            <td>{{ player['minutes'] }}</td>
+            <td>{{ player['points'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+ 
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-5">
+    <h5>Captain/Vice Captain</h5>   
+    <hr> 
+    <table class="dtSquad table table-striped  table-sm" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th></th>
+                <th>Mins</th>
+                <th>Pts</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in data['cvc'] %}
+            <tr>
+                <td>{{ player['selection'] }}</td>
+                <td>{{ player['name'] }}</td>
+                <td><img class="clublogosmall" src="../static/images/{{ player['team'] }}.png"/> {{ player['team'] }}</td>
+                <td>{{ player['minutes'] }}</td>
+                <td>{{ player['points'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    </div>
+</div>
+<div class="breakplayers"></div>
+<hr>
+
+
+
+
+<div class="breakplayers"></div>
+<hr>
+<div class="breakplayers"></div>
+
+{% endblock %}
+
