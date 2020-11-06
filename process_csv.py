@@ -13,10 +13,10 @@ import csv
 import json
 
 
-current_gw = 4
-csv_file_name = "src/data/csvs/Reddit Anti-Fantasy '20 -'21 - GW {gw}.csv"
-output_json_name = "src/data/gw_jsons/gw_{gw}.json"
-manager_id_file = "src/data/manager_id_mapping.json"
+current_gw = 7
+csv_file_name = "app/data/csvs/Reddit Anti-Fantasy '20 -'21 - GW {gw}.csv"
+output_json_name = "app/data/gw_jsons/gw_{gw}.json"
+manager_id_file = "app/data/manager_id_mapping.json"
 
 
 def read_csv(gw):
@@ -77,15 +77,17 @@ def create_gw_json(gw):
     final_dict = {}
 
     for k in manager_id_dict.keys():
-        final_dict[manager_id_dict[k]] = {
-            'points': gw_res[k]['points'],
-            'name': k,
-            'rank': gw_res[k]['rank']
-        }
-
+        try:
+            final_dict[manager_id_dict[k]] = {
+                'points': gw_res[k]['points'],
+                'name': k,
+                'rank': gw_res[k]['rank']
+            }
+        except KeyError:
+            pass
     with open(output_json_name.format(gw=gw), 'w') as file:
         file.write(json.dumps(final_dict))
 
 
-read_csv(current_gw)
+# read_csv(current_gw)
 create_gw_json(current_gw)
