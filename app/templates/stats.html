@@ -15,6 +15,7 @@
     <thead>
         <tr>
             <th>#</th>
+            <th>%</th>
             <th>Name</th>
             <th></th>
             <th>Mins</th>
@@ -25,6 +26,7 @@
         {% for player in data['starting_xi'] %}
         <tr>
             <td>{{ player['selection'] }}</td>
+            <td>{{ "%.1f"|format(player['selection']/1.1) }}</td>
             <td>{{ player['name'] }}</td>
             <td><img class="clublogosmall" src="../static/images/{{ player['team'] }}.png"/> {{ player['team'] }}</td>
             <td>{{ player['minutes'] }}</td>
