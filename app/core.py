@@ -75,6 +75,7 @@ def find_current_gw():
     Returns:
         int: Gamweeek corresponding to the request time, 0 if invalid
     """
+    return 8
     # with open(fixture_date_file, 'r') as file:
     #     fixtures = file.read()
     # fixture_d = json.loads(fixtures)
@@ -84,7 +85,7 @@ def find_current_gw():
     # 4500s / 75min after the GW deadline
     # GW deadline is roughly 90min / 5400s before first fixture
     for f in fixtures:
-        if f['deadline_time_epoch'] + 4500 > epoch_time:
+        if f['deadline_time_epoch'] + 1 > epoch_time:
             return f['id'] - 1
     return 0
 
