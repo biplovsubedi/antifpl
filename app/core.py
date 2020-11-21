@@ -75,7 +75,7 @@ def find_current_gw():
     Returns:
         int: Gamweeek corresponding to the request time, 0 if invalid
     """
-    return 8
+    return 9
     # with open(fixture_date_file, 'r') as file:
     #     fixtures = file.read()
     # fixture_d = json.loads(fixtures)
@@ -431,7 +431,7 @@ def find_inactive_players(picks, player_minutes):
     for p in picks['picks']:
         if p['multiplier'] != 0 and player_minutes[p['element']] != 0:
             active_cnt += 1
-    return 11 - active_cnt
+    return abs(11 - active_cnt)
 
 
 def get_inactive_players_penalty(gw, gw_standings):
