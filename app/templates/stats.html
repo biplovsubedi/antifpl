@@ -5,6 +5,11 @@
 <p class="" >
     Statistics for Anti FPL Selection
 </p>
+<h5>Previous GW stats (<a href="/stats">Current</a>)</h5>
+{% for gw in range(7, gameweeks) %}
+    <a href="/stats{{ gw }}"><p style="display:inline">GW-{{ gw }}</p></a>
+{% endfor %}
+<hr>
 <center><h3>Most Popular</h3></center>
 <hr>
 <div class="row">

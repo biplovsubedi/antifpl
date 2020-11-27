@@ -3,11 +3,14 @@
 {% block content %}
 <h4>{% block title %} GW {{ gameweek }} ( {{ status }} ){% endblock %} - <a href="/stats">GW Stats</a> - <a href="/dream">Dream Team</a></h4>
 <p class="" >
-    Please note that this is <b>still under development</b> and might have some errors. 
-    This gives you a decent understanding of your GW positon, but all final calculations will be<b> available in the excel sheet</b>. 
-    <br>Bank Penalty (+25 points for >3.0 in the bank), C/VC not playing (+15 ), less than 11 inactive players(+9 per players), and GW Transfer Costs are added to your Total Points.
-    You can sort by any column, or search for any criteria.
-</p>
+   Bank Penalty (+25 points for >3.0 in the bank), C/VC not playing (+15 ), less than 11 inactive players(+9 per players), and GW Transfer Costs are added to your Total Points.</p>
+
+<h5>Previous GW Points (<a href="/">Current</a>)</h5>
+{% for gw in range(5, gameweeks) %}
+    <a href="/gw{{ gw }}"><p style="display:inline">GW-{{ gw }}</p></a>
+{% endfor %}
+<hr>
+<div>
 <table id="dtBasicExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%">
     <thead>
         <tr>
@@ -77,6 +80,7 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 <div class="breakplayers"></div>
 <hr>
 <div class="breakplayers"></div>

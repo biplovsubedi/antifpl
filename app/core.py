@@ -75,7 +75,7 @@ def find_current_gw():
     Returns:
         int: Gamweeek corresponding to the request time, 0 if invalid
     """
-    return 10
+    return 9
     # with open(fixture_date_file, 'r') as file:
     #     fixtures = file.read()
     # fixture_d = json.loads(fixtures)
@@ -931,3 +931,20 @@ def fetch_standings():
     if current - updated < 500:
         return data
     return get_live_result()
+
+
+def fetch_historical_standings(gw):
+    """Fetch historical gw standings 
+
+    Args:
+        gw (int): gw to fetch
+
+    Returns:
+        list: standings of all managers
+    """
+
+    try:
+        with open(f'app/data/gw_standings/standings_{gw}.json', 'r') as file:
+            return json.loads(file.read())
+    except:
+        return []

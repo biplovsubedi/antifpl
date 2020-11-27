@@ -150,9 +150,9 @@ def get_picks_dynamic(gw, picks_static):
     return picks_static
 
 
-def get_statistics():
+def get_statistics(gw=None):
 
-    gw = find_current_gw()
+    gw = gw or find_current_gw()
     current = calendar.timegm(time.gmtime())
     try:
         with open(f'app/data/stats/dynamic_{gw}.json', 'r') as f:
