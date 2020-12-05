@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# standings files
+# app/data/gw_standings/*
+
 # C extensions
 *.so
 
