@@ -101,7 +101,6 @@ def is_gw_completed(gw):
     Returns:
         bool: True if Completed, False Otherwise
     """
-    return False
     bootstrap_static = request_data_from_url(url_bootstrap_static)
     try:
         events = bootstrap_static['events']
