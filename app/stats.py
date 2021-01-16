@@ -4,7 +4,7 @@ import calendar
 import time
 from flask import Flask, render_template
 
-from app.core import find_current_gw, request_data_from_url, get_gw_all_teams, get_gw_players_data, is_gw_completed
+from app.core import get_players_metadata, find_current_gw, request_data_from_url, get_gw_all_teams, get_gw_players_data, is_gw_completed
 
 
 def sort_dictionary_by_val(d):
@@ -14,8 +14,11 @@ def sort_dictionary_by_val(d):
 def add_player_metadata(players):
 
     # get metadata
-    with open('app/data/players_metadata.json') as f:
-        p_meta = json.loads(f.read())
+    try:
+        with open('app/data/players_metadata.json') as f:
+            p_meta = json.loads(f.read())
+    except:
+        p_meta = get_players_metadata()
 
     ret_l = []
     for id, sel in players.items():

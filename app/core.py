@@ -1,4 +1,6 @@
 """
+Missed gw ?? use this
+
 Web Application to keep track of anti fantasy points.
 
 Main File of the flask application. Implements a route to /
@@ -75,7 +77,7 @@ def find_current_gw():
     Returns:
         int: Gamweeek corresponding to the request time, 0 if invalid
     """
-    # return 16
+    return 19
     # with open(fixture_date_file, 'r') as file:
     #     fixtures = file.read()
     # fixture_d = json.loads(fixtures)
