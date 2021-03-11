@@ -84,9 +84,9 @@ def find_current_gw():
     # fixture_d = json.loads(fixtures)
     epoch_time = calendar.timegm(time.gmtime())
 
-   # 4500s / 75min after the GW deadline
-   # GW deadline is roughly 90min / 5400s before first fixture
-   for f in fixtures:
+    # 4500s / 75min after the GW deadline
+    # GW deadline is roughly 90min / 5400s before first fixture
+    for f in fixtures:
         if f['deadline_time_epoch'] + 4000 > epoch_time:
             return f['id'] - 1
     return 0
