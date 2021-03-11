@@ -77,13 +77,12 @@ def find_current_gw():
     Returns:
         int: Gamweeek corresponding to the request time, 0 if invalid
     """
-    # return 20
+    return 27
     # with open(fixture_date_file, 'r') as file:
     #     fixtures = file.read()
     # fixture_d = json.loads(fixtures)
     epoch_time = calendar.timegm(time.gmtime())
 
-    # TODO verify that this delay works
     # 4500s / 75min after the GW deadline
     # GW deadline is roughly 90min / 5400s before first fixture
     for f in fixtures:
@@ -256,6 +255,7 @@ def filter_all_gw_picks(gw, complete_gw_picks):
             "itb": float(picks['entry_history']['bank'])/10.0,
             "squad_value": float(picks['entry_history']['value'])/10.0,
             "transfer_cost": int(picks['entry_history']['event_transfers_cost']),
+            "points": int(picks['entry_history']['points']),
             "transfers": int(picks['entry_history']['event_transfers']),
             "captains": find_captains(picks)
         }
@@ -723,7 +723,8 @@ def process_total_gw(gw, gw_standings, gw_completed_=False):
                 "squad_value": 0.0,
                 "transfer_cost": 0,
                 "transfers": 0,
-                "captains": (0, 0)
+                "captains": (0, 0),
+                "points": 0
             }
 
         try:
@@ -742,17 +743,20 @@ def process_total_gw(gw, gw_standings, gw_completed_=False):
             bank_penalty = 0
             if gw_pick['itb'] > 3.0:
                 bank_penalty = 25
-
+            # points_ = gw_pick['points']  # player['event_total']
+            # NOTE: mark as gw_pick['points'] if missed gw
+            points_ = player['event_total']
             final_gw_total.append({
                 'id':  player['id'],
                 'player_name':  player['player_name'],
                 'entry_name':  player['entry_name'],
                 'entry':  player['entry'],
-                'event_total':  player['event_total'],
+                # 'event_total':  player['event_total'],  # TODO
+                'event_total':  points_,  # TODO
                 'last_gw_points': last_gw_points,
                 'last_gw_rank': last_gw_rank,
-                'final_gw_points': player['event_total'] + bank_penalty + gw_pick["transfer_cost"] + int(cap_penalty) + int(inactive_players_pen),
-                'total_points': player['event_total'] + last_gw_points + bank_penalty + gw_pick["transfer_cost"] + cap_penalty + inactive_players_pen,
+                'final_gw_points': points_ + bank_penalty + gw_pick["transfer_cost"] + int(cap_penalty) + int(inactive_players_pen),
+                'total_points': points_ + last_gw_points + bank_penalty + gw_pick["transfer_cost"] + cap_penalty + inactive_players_pen,
                 "active_chip": gw_pick["active_chip"],
                 "itb": gw_pick['itb'],
                 # "sqaud_value": round(gw_pick["squad_value"] - gw_pick['itb'], 1),

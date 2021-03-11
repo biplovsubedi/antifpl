@@ -75,7 +75,7 @@ def find_current_gw():
     Returns:
         int: Gamweeek corresponding to the request time, 0 if invalid
     """
-    return 19
+    return 21
 
     # with open(fixture_date_file, 'r') as file:
     #     fixtures = file.read()
@@ -747,6 +747,7 @@ def process_total_gw(gw, gw_standings, gw_completed_=False):
         if gw_pick['itb'] > 3.0:
             bank_penalty = 25
         print(gw_pick)
+        print(player)
         final_gw_total.append({
             'id':  player['id'],
             'player_name':  player['player_name'],
