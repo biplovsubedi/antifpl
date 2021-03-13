@@ -1,4 +1,6 @@
 """
+Missed gw ?? use this
+
 Web Application to keep track of anti fantasy points.
 
 Main File of the flask application. Implements a route to /
@@ -35,7 +37,7 @@ fixture_date_file = 'app/data/fixtures_date.json'
 
 """
 Endpoints:
-/https://fantasy.premierleague.com/api/entry/4621202/event/4/picks  -> See picks for a player in a week
+https://fantasy.premierleague.com/api/entry/4621202/event/4/picks/  -> See picks for a player in a week
 History of a player: https://fantasy.premierleague.com/api/entry/4621202/history/
 """
 
@@ -75,14 +77,13 @@ def find_current_gw():
     Returns:
         int: Gamweeek corresponding to the request time, 0 if invalid
     """
-    return 21
 
+    return 28
     # with open(fixture_date_file, 'r') as file:
     #     fixtures = file.read()
     # fixture_d = json.loads(fixtures)
     epoch_time = calendar.timegm(time.gmtime())
 
-    # TODO verify that this delay works
     # 4500s / 75min after the GW deadline
     # GW deadline is roughly 90min / 5400s before first fixture
     for f in fixtures:
@@ -103,7 +104,7 @@ def is_gw_completed(gw):
     Returns:
         bool: True if Completed, False Otherwise
     """
-    return True
+    # return True
     bootstrap_static = request_data_from_url(url_bootstrap_static)
     try:
         events = bootstrap_static['events']
@@ -255,16 +256,16 @@ def filter_all_gw_picks(gw, complete_gw_picks):
             "itb": float(picks['entry_history']['bank'])/10.0,
             "squad_value": float(picks['entry_history']['value'])/10.0,
             "transfer_cost": int(picks['entry_history']['event_transfers_cost']),
+            "points": int(picks['entry_history']['points']),
             "transfers": int(picks['entry_history']['event_transfers']),
-            "captains": find_captains(picks),
-            "points": int(picks['entry_history']['points'])
+            "captains": find_captains(picks)
         }
     with(open(f'app/data/gw_teams/filtered/gw_filtered_{gw}.json', 'w')) as f:
         f.write(json.dumps(filtered_gw_picks))
     return filtered_gw_picks
 
 
-def fetch_pick_for_all_players(gw, managers_id_list):
+def fetch_pick_for_all_players(gw, players_id):
     """For all the players in the league, find their respective
     gameweek picks.
     This information is used to find captains/vice captains, bank/squad value,
@@ -285,7 +286,7 @@ def fetch_pick_for_all_players(gw, managers_id_list):
         dict: Contains the gw picks information for all managers
     """
     complete_gw_picks = {}
-    for entry_id in managers_id_list:
+    for entry_id in players_id:
         # entry_id = player['entry']
 
         picks = request_data_from_url(
@@ -301,13 +302,13 @@ def fetch_pick_for_all_players(gw, managers_id_list):
     return complete_gw_picks
 
 
-def process_gw_player_teams(gw, manager_id_list):
+def process_gw_player_teams(gw, gw_standings):
     """Starts the process to load the gw picks for all managers
     Checks if has already been done, return the file if available
 
     Args:
         gw (int): gameweek
-        manager_id_list (list): List of all managers in the ML
+        gw_standings (list): List of all managers in the ML
 
     Returns:
         dict: Filtered GW picks for all managers
@@ -322,18 +323,18 @@ def process_gw_player_teams(gw, manager_id_list):
         pass
 
     complete_gw_picks = fetch_pick_for_all_players(
-        gw, manager_id_list)
+        gw, [g['entry'] for g in gw_standings])
 
     return filter_all_gw_picks(gw, complete_gw_picks)
 
 
-def get_gw_teams_players(gw, manager_id_list):
+def get_gw_teams_players(gw, gw_standings):
     """Find the gw picks (filtered for all managers)
     Checks if the file exists, else calls the function to create it
 
     Args:
         gw (int): gameweek
-        manager_id_list (list): list of all managers in the ML
+        gw_standings (list): list of all managers in the ML
 
     Returns:
         dict: filtered dict on gw picks
@@ -342,7 +343,7 @@ def get_gw_teams_players(gw, manager_id_list):
         with(open(f'app/data/gw_teams/filtered/gw_filtered_{gw}.json', 'r')) as f:
             return json.loads(f.read())
     except FileNotFoundError:
-        return process_gw_player_teams(gw, manager_id_list)
+        return process_gw_player_teams(gw, gw_standings)
 
 
 def calculate_player_minutes(gw):
@@ -690,8 +691,7 @@ def process_total_gw(gw, gw_standings, gw_completed_=False):
     last_gw_total = get_last_gw_standings(gw-1)
 
     # Get hits/captain/VC/Team Value
-    players_gw_teams = get_gw_teams_players(gw, last_gw_total.keys())
-    # players_gw_teams = get_gw_teams_players(gw, gw_standings)
+    players_gw_teams = get_gw_teams_players(gw, gw_standings)
 
     # check if gw is completed
     inactive_players_penalties = {}
@@ -703,7 +703,6 @@ def process_total_gw(gw, gw_standings, gw_completed_=False):
 
     final_gw_total = []
     for player in gw_standings:
-        # print(player)
         try:
             last_gw_points = last_gw_total[str(player['entry'])]['points']
             last_gw_rank = last_gw_total[str(player['entry'])]['rank']
@@ -713,7 +712,6 @@ def process_total_gw(gw, gw_standings, gw_completed_=False):
             # print("no record for last gw" + str(player['entry']))
 
         if last_gw_points == 0:
-            print("skipping")
             continue
 
         try:
@@ -742,44 +740,44 @@ def process_total_gw(gw, gw_standings, gw_completed_=False):
             inactive_players = 0
             inactive_players_pen = 0
 
-        # try:
-        bank_penalty = 0
-        if gw_pick['itb'] > 3.0:
-            bank_penalty = 25
-        print(gw_pick)
-        print(player)
-        final_gw_total.append({
-            'id':  player['id'],
-            'player_name':  player['player_name'],
-            'entry_name':  player['entry_name'],
-            'entry':  player['entry'],
-            'event_total':  gw_pick['points'],
-            'last_gw_points': last_gw_points,
-            'last_gw_rank': last_gw_rank,
-            'final_gw_points': gw_pick['points'] + bank_penalty + gw_pick["transfer_cost"] + int(cap_penalty) + int(inactive_players_pen),
-            'total_points': gw_pick['points'] + last_gw_points + bank_penalty + gw_pick["transfer_cost"] + cap_penalty + inactive_players_pen,
-            "active_chip": gw_pick["active_chip"],
-            "itb": gw_pick['itb'],
-            # "sqaud_value": round(gw_pick["squad_value"] - gw_pick['itb'], 1),
-            "sqaud_value": gw_pick["squad_value"],
-            "transfer_cost": gw_pick["transfer_cost"],
-            "captains": gw_pick["captains"],
-            "transfers": gw_pick["transfers"],
-            "cap_penalty": cap_penalty,
-            "inactive_players": inactive_players,
-            'inactive_players_pen': inactive_players_pen
+        try:
+            bank_penalty = 0
+            if gw_pick['itb'] > 3.0:
+                bank_penalty = 25
+            # points_ = gw_pick['points']  # player['event_total']
+            # NOTE: mark as gw_pick['points'] if missed gw
+            points_ = player['event_total']
+            final_gw_total.append({
+                'id':  player['id'],
+                'player_name':  player['player_name'],
+                'entry_name':  player['entry_name'],
+                'entry':  player['entry'],
+                # 'event_total':  player['event_total'],  # TODO
+                'event_total':  points_,  # TODO
+                'last_gw_points': last_gw_points,
+                'last_gw_rank': last_gw_rank,
+                'final_gw_points': points_ + bank_penalty + gw_pick["transfer_cost"] + int(cap_penalty) + int(inactive_players_pen),
+                'total_points': points_ + last_gw_points + bank_penalty + gw_pick["transfer_cost"] + cap_penalty + inactive_players_pen,
+                "active_chip": gw_pick["active_chip"],
+                "itb": gw_pick['itb'],
+                # "sqaud_value": round(gw_pick["squad_value"] - gw_pick['itb'], 1),
+                "sqaud_value": gw_pick["squad_value"],
+                "transfer_cost": gw_pick["transfer_cost"],
+                "captains": gw_pick["captains"],
+                "transfers": gw_pick["transfers"],
+                "cap_penalty": cap_penalty,
+                "inactive_players": inactive_players,
+                'inactive_players_pen': inactive_players_pen
 
-        })
-        # except KeyError:
-        #     print("key error - skipping")
-        #     pass
+            })
+        except KeyError:
+            pass
 
     # sort the list
     final_gw_total = sorted(final_gw_total, key=itemgetter('total_points'))
     # Add rank value
     for i, item in enumerate(final_gw_total):
         item['rank'] = i+1
-        print(item)
 
     # dump data to gw_standings and status == finished
     return dump_json_with_time(gw, final_gw_total, gw_completed_ and inactive_players_penalties != {})
