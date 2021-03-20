@@ -75,7 +75,7 @@ def find_current_gw():
     Returns:
         int: Gamweeek corresponding to the request time, 0 if invalid
     """
-    return 28
+    return 29
 
     # with open(fixture_date_file, 'r') as file:
     #     fixtures = file.read()
@@ -103,7 +103,7 @@ def is_gw_completed(gw):
     Returns:
         bool: True if Completed, False Otherwise
     """
-    return True
+    return False
     bootstrap_static = request_data_from_url(url_bootstrap_static)
     try:
         events = bootstrap_static['events']
