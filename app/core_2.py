@@ -104,7 +104,7 @@ def is_gw_completed(gw):
     Returns:
         bool: True if Completed, False Otherwise
     """
-    # return True
+    return True
     bootstrap_static = request_data_from_url(url_bootstrap_static)
     try:
         events = bootstrap_static['events']
@@ -744,9 +744,9 @@ def process_total_gw(gw, gw_standings, gw_completed_=False):
             bank_penalty = 0
             if gw_pick['itb'] > 3.0:
                 bank_penalty = 25
-            # points_ = gw_pick['points']  # player['event_total']
+            points_ = gw_pick['points']  # player['event_total']
             # NOTE: mark as gw_pick['points'] if missed gw
-            points_ = player['event_total']
+            # points_ = player['event_total']
             final_gw_total.append({
                 'id':  player['id'],
                 'player_name':  player['player_name'],
