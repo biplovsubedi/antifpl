@@ -78,7 +78,7 @@ def find_current_gw():
         int: Gamweeek corresponding to the request time, 0 if invalid
     """
 
-    return 29
+    return 30
     # with open(fixture_date_file, 'r') as file:
     #     fixtures = file.read()
     # fixture_d = json.loads(fixtures)
