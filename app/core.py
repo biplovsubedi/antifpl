@@ -81,7 +81,6 @@ def find_current_gw():
     # fixture_d = json.loads(fixtures)
     epoch_time = calendar.timegm(time.gmtime())
 
-    # TODO verify that this delay works
     # 4500s / 75min after the GW deadline
     # GW deadline is roughly 90min / 5400s before first fixture
     for f in fixtures:
@@ -102,7 +101,7 @@ def is_gw_completed(gw):
     Returns:
         bool: True if Completed, False Otherwise
     """
-    return False
+    return True
     bootstrap_static = request_data_from_url(url_bootstrap_static)
     try:
         events = bootstrap_static['events']
