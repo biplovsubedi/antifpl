@@ -75,16 +75,16 @@ def find_current_gw():
     Returns:
         int: Gamweeek corresponding to the request time, 0 if invalid
     """
+    return 32
     # with open(fixture_date_file, 'r') as file:
     #     fixtures = file.read()
     # fixture_d = json.loads(fixtures)
     epoch_time = calendar.timegm(time.gmtime())
 
-    # TODO verify that this delay works
     # 4500s / 75min after the GW deadline
     # GW deadline is roughly 90min / 5400s before first fixture
     for f in fixtures:
-        if f['deadline_time_epoch'] + 4500 > epoch_time:
+        if f['deadline_time_epoch'] + 4000 > epoch_time:
             return f['id'] - 1
     return 0
 
@@ -101,6 +101,7 @@ def is_gw_completed(gw):
     Returns:
         bool: True if Completed, False Otherwise
     """
+    return True
     bootstrap_static = request_data_from_url(url_bootstrap_static)
     try:
         events = bootstrap_static['events']
@@ -427,10 +428,12 @@ def find_inactive_players(picks, player_minutes):
         int: Number of starting XI players who didn't play in that GW
     """
     active_cnt = 0
+    total_players = 15 if picks['active_chip'] == 'bboost' else 11
+
     for p in picks['picks']:
         if p['multiplier'] != 0 and player_minutes[p['element']] != 0:
             active_cnt += 1
-    return 11 - active_cnt
+    return abs(total_players - active_cnt)
 
 
 def get_inactive_players_penalty(gw, gw_standings):
@@ -704,6 +707,9 @@ def process_total_gw(gw, gw_standings, gw_completed_=False):
             last_gw_rank = ''
             # print("no record for last gw" + str(player['entry']))
 
+        if last_gw_points == 0:
+            continue
+
         try:
             gw_pick = players_gw_teams[str(player["entry"])]
         except KeyError:
@@ -927,3 +933,20 @@ def fetch_standings():
     if current - updated < 500:
         return data
     return get_live_result()
+
+
+def fetch_historical_standings(gw):
+    """Fetch historical gw standings 
+
+    Args:
+        gw (int): gw to fetch
+
+    Returns:
+        list: standings of all managers
+    """
+
+    try:
+        with open(f'app/data/gw_standings/standings_{gw}.json', 'r') as file:
+            return json.loads(file.read())
+    except:
+        return []

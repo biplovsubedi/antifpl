@@ -5,6 +5,11 @@
 <p class="" >
     Statistics for Anti FPL Selection
 </p>
+<h5>Previous GW stats (<a href="/stats">Current</a>)</h5>
+{% for gw in range(7, gameweeks) %}
+    <a href="/stats{{ gw }}"><p style="display:inline">GW-{{ gw }}</p></a>
+{% endfor %}
+<hr>
 <center><h3>Most Popular</h3></center>
 <hr>
 <div class="row">
@@ -15,6 +20,7 @@
     <thead>
         <tr>
             <th>#</th>
+            <th>%</th>
             <th>Name</th>
             <th></th>
             <th>Mins</th>
@@ -25,6 +31,7 @@
         {% for player in data['starting_xi'] %}
         <tr>
             <td>{{ player['selection'] }}</td>
+            <td>{{ "%.1f"|format(player['selection']/0.91) }}</td>
             <td>{{ player['name'] }}</td>
             <td><img class="clublogosmall" src="../static/images/{{ player['team'] }}.png"/> {{ player['team'] }}</td>
             <td>{{ player['minutes'] }}</td>
@@ -69,7 +76,7 @@
 <hr>
 <div class="row">
     <div class="col-md-5">
-    <h5>Captaincy Pics</h5>
+    <h5>Captain</h5>
     <hr>
     <table class="dtSquad table table-striped  table-sm" cellspacing="0" width="100%">
     <thead>
